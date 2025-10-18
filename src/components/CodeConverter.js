@@ -29,39 +29,75 @@ const CodeConverter = () => {
   const targetEditorRef = useRef(null);
   const navigate = useNavigate();
 
+  // const handleConvert = async () => {
+  //   if (!sourceCode) {
+  //     setError("Please enter code to convert");
+  //     return;
+  //   }
+  //   setError("");
+  //   setLoading(true);
+
+  //   try {
+  //     const response = fetch(`${process.env.REACT_APP_API_URL}/api/convert/`,{
+  //     // const response = await fetch("http://127.0.0.1:8000/api/convert/", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         source_lang: sourceLang,
+  //         target_lang: targetLang,
+  //         code: sourceCode,
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+  //     if (response.ok) {
+  //       setConvertedCode(data.converted_code);
+  //     } else {
+  //       setError(data.error || "Conversion failed");
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     setError("Server error - please try again");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleConvert = async () => {
-    if (!sourceCode) {
-      setError("Please enter code to convert");
-      return;
-    }
-    setError("");
-    setLoading(true);
+  if (!sourceCode) {
+    setError("Please enter code to convert");
+    return;
+  }
 
-    try {
-      const response = fetch(`${process.env.REACT_APP_API_URL}/api/convert/`,{
-      // const response = await fetch("http://127.0.0.1:8000/api/convert/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source_lang: sourceLang,
-          target_lang: targetLang,
-          code: sourceCode,
-        }),
-      });
+  setError("");
+  setLoading(true);
 
-      const data = await response.json();
-      if (response.ok) {
-        setConvertedCode(data.converted_code);
-      } else {
-        setError(data.error || "Conversion failed");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Server error - please try again");
-    } finally {
-      setLoading(false);
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/convert/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source_lang: sourceLang,
+        target_lang: targetLang,
+        code: sourceCode,
+      }),
+    });
+
+    // ✅ parse only after await
+    const data = await response.json();
+
+    if (response.ok) {
+      setConvertedCode(data.converted_code);
+    } else {
+      setError(data.error || "Conversion failed");
     }
-  };
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError("Server error - please try again later");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const copyToClipboard = () => {
     if (convertedCode) {
